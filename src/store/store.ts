@@ -1,7 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
-import authReducer from './slices/authSlice';
-import goalsReducer from './slices/goalsSlice';
-import resourcesReducer from './slices/resourcesSlice';
+import authReducer from './slices/authSlice.ts';
+import goalsReducer from './slices/goalsSlice.ts';
+import resourcesReducer from './slices/resourcesSlice.ts';
 /**
  * @fileoverview This file contains the store configuration for the application.
  * @reducers authReducer, goalsReducer, resourcesReducer

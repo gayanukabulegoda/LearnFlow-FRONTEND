@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import type {ResourcesState} from '../../types/types.ts';
-import api from '../../lib/axios';
+import api from '../../lib/axios.ts';
 /**
  * @fileoverview This file contains the resources slice for the application.
  * @exports fetchRecommendations, trackInteraction

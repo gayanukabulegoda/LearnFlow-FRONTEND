@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {fetchGoals} from '../store/slices/goalsSlice';
-import {fetchRecommendations} from '../store/slices/resourcesSlice';
+import {useAppDispatch, useAppSelector} from '../store/hooks.ts';
+import {fetchGoals} from '../store/slices/goalsSlice.ts';
+import {fetchRecommendations} from '../store/slices/resourcesSlice.ts';
 import {
     Target,
     Book,

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Navigate} from 'react-router-dom';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
-import {login, clearError} from '../store/slices/authSlice';
+import {useAppDispatch, useAppSelector} from '../store/hooks.ts';
+import {login, clearError} from '../store/slices/authSlice.ts';
 import {Mail, Lock} from 'lucide-react';
 import AuthLayout from '../components/auth/AuthLayout';
 import AuthCard from '../components/auth/AuthCard';

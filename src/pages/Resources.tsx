@@ -1,9 +1,9 @@
 import {useEffect, useState, useMemo} from 'react';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
+import {useAppDispatch, useAppSelector} from '../store/hooks.ts';
 import {
     fetchRecommendations,
     trackInteraction,
-} from '../store/slices/resourcesSlice';
+} from '../store/slices/resourcesSlice.ts';
 import {
     ExternalLink,
     FileText,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import Button from '../components/common/Button.tsx';
 import Input from '../components/common/Input.tsx';
-import {cn} from '../lib/utils';
+import {cn} from '../lib/utils.ts';
 import Card from "../components/common/Card.tsx";
 import PageHeader from "../components/common/PageHeader.tsx";
 /**

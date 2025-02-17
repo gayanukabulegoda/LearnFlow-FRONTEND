@@ -13,7 +13,7 @@ import {
     ChevronRight,
 } from 'lucide-react';
 import Button from './common/Button.tsx';
-import {cn} from '../lib/utils';
+import {cn} from '../lib/utils.ts';
 /**
  * @fileOverview A layout component that wraps the main content with a sidebar and header.
  * @returns The {@link JSX.Element} for the layout component.

@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {useAppDispatch, useAppSelector} from '../store/hooks';
+import {useAppDispatch, useAppSelector} from '../store/hooks.ts';
 import {
     fetchGoals,
     createGoal,
@@ -8,11 +8,11 @@ import {
     fetchGoalProgress,
     logProgress,
     setSelectedGoal,
-} from '../store/slices/goalsSlice';
+} from '../store/slices/goalsSlice.ts';
 import {Plus, Target} from 'lucide-react';
 import Button from '../components/common/Button.tsx';
-import GoalCard from '../components/custom/GoalCard';
-import ProgressModal from '../components/custom/ProgressModal';
+import GoalCard from '../components/custom/GoalCard.tsx';
+import ProgressModal from '../components/custom/ProgressModal.tsx';
 import PageHeader from "../components/common/PageHeader.tsx";
 import CreateGoalModal from "../components/custom/CreateGoalModel.tsx";
 /**

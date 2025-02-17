@@ -2,7 +2,7 @@ import {format} from 'date-fns';
 import {Calendar, Trash2, CheckCircle, BarChart2, Clock, Target} from 'lucide-react';
 import {Goal} from '../../types/types.ts';
 import Button from '../common/Button.tsx';
-import ProgressChart from './ProgressChart';
+import ProgressChart from './ProgressChart.tsx';
 /**
  * @fileoverview This file contains the GoalCard component.
  * @interface GoalCardProps - The props for the GoalCard component.

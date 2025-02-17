@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import type {AuthState} from '../../types/types.ts';
-import api from '../../lib/axios';
+import api from '../../lib/axios.ts';
 /**
  * @fileoverview This file contains the auth slice for the application.
  * @exports login, register, getCurrentUser, logout, clearError

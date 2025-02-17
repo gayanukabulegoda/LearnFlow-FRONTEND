@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import type {GoalsState, Goal} from '../../types/types.ts';
-import api from '../../lib/axios';
+import api from '../../lib/axios.ts';
 /**
  * @fileoverview This file contains the goals slice for the application.
  * @exports fetchGoals, createGoal, updateGoal, deleteGoal, fetchGoalProgress, logProgress, setSelectedGoal

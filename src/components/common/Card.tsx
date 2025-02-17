@@ -1,5 +1,5 @@
 import React from 'react';
-import {cn} from '../../lib/utils';
+import {cn} from '../../lib/utils.ts';
 /**
  * @fileOverview This Card component is used to render cards with a gradient background and shadow.
  * @interface CardProps - The props for the Card component.

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Navigate} from 'react-router-dom';
-import {useAppSelector, useAppDispatch} from '../store/hooks';
-import {getCurrentUser} from '../store/slices/authSlice';
+import {useAppSelector, useAppDispatch} from '../store/hooks.ts';
+import {getCurrentUser} from '../store/slices/authSlice.ts';
 /**
  * @fileOverview A wrapper component that checks if the user is authenticated before rendering the children.
  * @param children - The children to render if the user is authenticated.
