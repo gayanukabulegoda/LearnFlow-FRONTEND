@@ -1,7 +1,11 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react';
-import { cn } from '../../lib/utils';
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+import {ButtonHTMLAttributes, forwardRef} from 'react';
+import {cn} from '../../lib/utils.ts';
+/**
+ * @fileOverview This Button component is used to render buttons with different variants and sizes.
+ * @interface ButtonProps - The props for the Button component.
+ * @returns {@link JSX.Element} for the Button component.
+ */
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
     size?: 'sm' | 'md' | 'lg';
     isLoading?: boolean;
@@ -48,7 +52,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 {...props}
             >
                 {isLoading ? (
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    <div
+                        className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"/>
                 ) : null}
                 {children}
             </button>

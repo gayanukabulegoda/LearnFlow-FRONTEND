@@ -9,18 +9,17 @@ import {
     logProgress,
     setSelectedGoal,
 } from '../store/slices/goalsSlice';
-import {format} from 'date-fns';
-import {
-    Plus,
-    Calendar,
-    Trash2,
-    CheckCircle,
-    XCircle,
-    BarChart2,
-} from 'lucide-react';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-
+import {Plus, Target} from 'lucide-react';
+import Button from '../components/common/Button.tsx';
+import GoalCard from '../components/custom/GoalCard';
+import ProgressModal from '../components/custom/ProgressModal';
+import PageHeader from "../components/common/PageHeader.tsx";
+import CreateGoalModal from "../components/custom/CreateGoalModel.tsx";
+/**
+ * @fileOverview The Goals component: used to manage learning goals.
+ * @features Create, update, delete, and log progress for learning goals.
+ * @exports Goals - The Goals component.
+ */
 const Goals = () => {
     const dispatch = useAppDispatch();
     const {goals, selectedGoal, progress, isLoading} = useAppSelector(
@@ -28,15 +27,6 @@ const Goals = () => {
     );
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
-    const [newGoal, setNewGoal] = useState({
-        title: '',
-        description: '',
-        targetDate: '',
-    });
-    const [newProgress, setNewProgress] = useState({
-        notes: '',
-        duration: 0,
-    });
 
     useEffect(() => {
         dispatch(fetchGoals());
@@ -48,50 +38,52 @@ const Goals = () => {
         }
     }, [dispatch, selectedGoal]);
 
-    const handleCreateGoal = async (e: React.FormEvent) => {
-        e.preventDefault();
-        // Format the date to ISO string for the backend
+    const handleCreateGoal = async (formData: {
+        title: string;
+        description: string;
+        targetDate: string
+    }) => {
         const formattedGoal = {
-            ...newGoal,
-            targetDate: new Date(newGoal.targetDate).toISOString(),
+            ...formData,
+            targetDate: new Date(formData.targetDate).toISOString(),
         };
         await dispatch(createGoal(formattedGoal));
-        setNewGoal({title: '', description: '', targetDate: ''});
         setIsCreateModalOpen(false);
     };
 
-    const handleUpdateStatus = async (id: number, status: string) => {
-        await dispatch(updateGoal({id, data: {status}}));
+    const handleUpdateStatus = async (id: number, status: 'COMPLETED') => {
+        const goal = goals.find((goal) => goal.id === id);
+        if (!goal) return;
+
+        await dispatch(updateGoal({
+            id,
+            data: {
+                title: goal.title,
+                description: goal.description,
+                targetDate: goal.targetDate,
+                status
+            }
+        }));
+        dispatch(fetchGoals());
     };
 
     const handleDeleteGoal = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this goal?')) {
             await dispatch(deleteGoal(id));
+            dispatch(fetchGoals());
         }
     };
 
-    const handleLogProgress = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleLogProgress = async (data: { notes: string; duration: number }) => {
         if (selectedGoal) {
             await dispatch(
                 logProgress({
                     goalId: selectedGoal.id,
-                    data: newProgress,
+                    data,
                 })
             );
-            setNewProgress({notes: '', duration: 0});
+            dispatch(fetchGoals());
             setIsProgressModalOpen(false);
-        }
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'COMPLETED':
-                return 'bg-green-100 text-green-800';
-            case 'IN_PROGRESS':
-                return 'bg-blue-100 text-blue-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
         }
     };
 
@@ -104,266 +96,80 @@ const Goals = () => {
     }
 
     return (
-        <div className="space-y-6 px-4 sm:px-6 max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Learning Goals</h1>
-                    <p className="mt-1 text-sm text-gray-500">
-                        Track and manage your learning objectives
-                    </p>
-                </div>
-                <Button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="w-full sm:w-auto"
-                >
-                    <Plus className="h-4 w-4 mr-2"/>
-                    New Goal
-                </Button>
-            </div>
+        <div
+            className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 -mt-8 -mx-4 sm:-mx-6 p-4 sm:p-6">
+            <div className="max-w-7xl mx-auto space-y-8">
+                {/* Header Section */}
+                <PageHeader
+                    title="Learning Goals"
+                    subtitle="Track and manage your learning objectives"
+                    icon={Target}
+                    iconColor="blue"
+                    headerContent={
+                        <Button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="w-full sm:w-auto transform-gpu transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg"
+                        >
+                            <Plus className="h-4 w-4 mr-2"/>
+                            New Goal
+                        </Button>
+                    }
+                />
 
-            {/* Goals Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {goals.map((goal) => (
-                    <div
-                        key={goal.id}
-                        className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6"
-                    >
-                        <div className="flex justify-between items-start">
-                            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
-                                {goal.title}
-                            </h3>
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    onClick={() => handleDeleteGoal(goal.id)}
-                                    className="text-gray-400 hover:text-red-500 p-1"
-                                >
-                                    <Trash2 className="h-4 w-4"/>
-                                </button>
-                            </div>
-                        </div>
-                        <p className="mt-2 text-xs sm:text-sm text-gray-600 line-clamp-2">
-                            {goal.description}
-                        </p>
-                        <div className="mt-4 flex items-center text-xs sm:text-sm text-gray-500">
-                            <Calendar className="h-4 w-4 mr-2 flex-shrink-0"/>
-                            {format(new Date(goal.targetDate), 'MMM d, yyyy')}
-                        </div>
+                {/* Goals Grid */}
+                {goals.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {goals.map((goal) => (
+                            <GoalCard
+                                key={goal.id}
+                                goal={goal}
+                                onDelete={handleDeleteGoal}
+                                onComplete={(id) => handleUpdateStatus(id, 'COMPLETED')}
+                                onLogProgress={(goal) => {
+                                    dispatch(setSelectedGoal(goal));
+                                    setIsProgressModalOpen(true);
+                                }}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12">
                         <div
-                            className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                      goal.status
-                  )}`}
-              >
-                {goal.status.replace('_', ' ')}
-              </span>
-                            {goal.status !== 'COMPLETED' && (
-                                <div className="flex flex-wrap gap-2">
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => {
-                                            dispatch(setSelectedGoal(goal));
-                                            setIsProgressModalOpen(true);
-                                        }}
-                                        className="text-xs"
-                                    >
-                                        <BarChart2 className="h-3 w-3 mr-1"/>
-                                        Log Progress
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => handleUpdateStatus(goal.id, 'COMPLETED')}
-                                        className="text-xs"
-                                    >
-                                        <CheckCircle className="h-3 w-3 mr-1"/>
-                                        Complete
-                                    </Button>
-                                </div>
-                            )}
+                            className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4 animate-bounce">
+                            <Target className="h-8 w-8 text-blue-600"/>
                         </div>
+                        <h3 className="mt-4 text-xl font-medium text-gray-900">No goals yet</h3>
+                        <p className="mt-2 text-sm text-gray-500">
+                            Create your first learning goal to get started
+                        </p>
+                        <Button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="mt-6"
+                        >
+                            <Plus className="h-4 w-4 mr-2"/>
+                            Create Goal
+                        </Button>
                     </div>
-                ))}
+                )}
             </div>
-
-            {goals.length === 0 && !isLoading && (
-                <div className="text-center py-12">
-                    <div className="rounded-full bg-blue-100 p-3 w-12 h-12 flex items-center justify-center mx-auto">
-                        <Plus className="h-6 w-6 text-blue-600"/>
-                    </div>
-                    <h3 className="mt-4 text-lg font-medium text-gray-900">No goals yet</h3>
-                    <p className="mt-2 text-sm text-gray-500">
-                        Create your first learning goal to get started
-                    </p>
-                </div>
-            )}
 
             {/* Create Goal Modal */}
             {isCreateModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg sm:text-xl font-semibold">Create New Goal</h2>
-                            <button
-                                onClick={() => setIsCreateModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-500"
-                            >
-                                <XCircle className="h-6 w-6"/>
-                            </button>
-                        </div>
-                        <form onSubmit={handleCreateGoal} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Title
-                                </label>
-                                <Input
-                                    type="text"
-                                    value={newGoal.title}
-                                    onChange={(e) =>
-                                        setNewGoal({...newGoal, title: e.target.value})
-                                    }
-                                    required
-                                    className="mt-1"
-                                    placeholder="Enter goal title"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Description
-                                </label>
-                                <textarea
-                                    value={newGoal.description}
-                                    onChange={(e) =>
-                                        setNewGoal({...newGoal, description: e.target.value})
-                                    }
-                                    required
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[80px]"
-                                    placeholder="Describe your goal"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Target Date
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={newGoal.targetDate}
-                                    onChange={(e) =>
-                                        setNewGoal({...newGoal, targetDate: e.target.value})
-                                    }
-                                    required
-                                    className="mt-1"
-                                />
-                            </div>
-                            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:space-x-3">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setIsCreateModalOpen(false)}
-                                    className="w-full sm:w-auto"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="submit" className="w-full sm:w-auto">
-                                    Create Goal
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <CreateGoalModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onCreate={handleCreateGoal}
+                />
             )}
 
-            {/* Log Progress Modal */}
+            {/* Progress Modal */}
             {isProgressModalOpen && selectedGoal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg sm:text-xl font-semibold">Log Progress</h2>
-                            <button
-                                onClick={() => setIsProgressModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-500"
-                            >
-                                <XCircle className="h-6 w-6"/>
-                            </button>
-                        </div>
-                        <form onSubmit={handleLogProgress} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Notes
-                                </label>
-                                <textarea
-                                    value={newProgress.notes}
-                                    onChange={(e) =>
-                                        setNewProgress({...newProgress, notes: e.target.value})
-                                    }
-                                    required
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[80px]"
-                                    placeholder="What did you accomplish?"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Duration (minutes)
-                                </label>
-                                <Input
-                                    type="number"
-                                    value={newProgress.duration}
-                                    onChange={(e) =>
-                                        setNewProgress({
-                                            ...newProgress,
-                                            duration: parseInt(e.target.value),
-                                        })
-                                    }
-                                    required
-                                    min="1"
-                                    className="mt-1"
-                                    placeholder="Enter time spent"
-                                />
-                            </div>
-                            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:space-x-3">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setIsProgressModalOpen(false)}
-                                    className="w-full sm:w-auto"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="submit" className="w-full sm:w-auto">
-                                    Log Progress
-                                </Button>
-                            </div>
-                        </form>
-
-                        {/* Progress History */}
-                        {progress.length > 0 && (
-                            <div className="mt-6">
-                                <h3 className="text-sm font-medium text-gray-700 mb-3">
-                                    Progress History
-                                </h3>
-                                <div className="space-y-3">
-                                    {progress.map((p) => (
-                                        <div
-                                            key={p.id}
-                                            className="bg-gray-50 rounded-lg p-3 text-sm"
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium">{p.notes}</span>
-                                                <span className="text-gray-500">
-                          {p.duration} minutes
-                        </span>
-                                            </div>
-                                            <div className="text-xs text-gray-500 mt-1">
-                                                {format(new Date(p.createdAt), 'MMM d, yyyy h:mm a')}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                <ProgressModal
+                    goal={selectedGoal}
+                    progress={progress}
+                    onClose={() => setIsProgressModalOpen(false)}
+                    onSubmit={handleLogProgress}
+                />
             )}
         </div>
     );

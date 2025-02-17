@@ -1,5 +1,10 @@
 import axios from 'axios';
-
+/**
+ * Axios instance for making API requests.
+ * Includes an interceptor to handle 401 errors by refreshing the access token.
+ * @function processQueue - Process the queue of requests that were waiting for the token to refresh.
+ * @exports api - Axios instance.
+ */
 const api = axios.create({
     baseURL: 'http://localhost:5000/api/v1',
     withCredentials: true,
@@ -29,8 +34,11 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // If the error is not 401 or the request has already been retried, reject
-        if (error.response?.status !== 401 || originalRequest._retry) {
+        // Add exclusion for auth endpoints
+        const isAuthRequest = originalRequest.url.includes('/auth/login') ||
+            originalRequest.url.includes('/auth/register');
+
+        if (error.response?.status !== 401 || originalRequest._retry || isAuthRequest) {
             return Promise.reject(error);
         }
 
@@ -40,7 +48,7 @@ api.interceptors.response.use(
 
             try {
                 const response = await api.post('/auth/refresh');
-                const { accessToken } = response.data.data;
+                const {accessToken} = response.data.data;
 
                 isRefreshing = false;
 
@@ -56,7 +64,7 @@ api.interceptors.response.use(
                 isRefreshing = false;
                 processQueue(refreshError as Error);
 
-                // If refresh token is invalid, redirect to login
+                // If refresh token is invalid, redirect to loginPage
                 if (error.response?.status === 401) {
                     window.location.href = '/login';
                 }

@@ -1,12 +1,16 @@
-import { forwardRef, InputHTMLAttributes } from 'react';
-import { cn } from '../../lib/utils';
-
+import {forwardRef, InputHTMLAttributes} from 'react';
+import {cn} from '../../lib/utils.ts';
+/**
+ * @fileOverview This Input component is used to render input fields with error messages.
+ * @interface InputProps - The props for the Input component.
+ * @returns {@link JSX.Element} for the Input component.
+ */
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     error?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, error, ...props }, ref) => {
+    ({className, error, ...props}, ref) => {
         return (
             <div className="w-full">
                 <input

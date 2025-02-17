@@ -1,7 +1,10 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import type {GoalsState, Goal} from '../../types';
+import type {GoalsState, Goal} from '../../types/types.ts';
 import api from '../../lib/axios';
-
+/**
+ * @fileoverview This file contains the goals slice for the application.
+ * @exports fetchGoals, createGoal, updateGoal, deleteGoal, fetchGoalProgress, logProgress, setSelectedGoal
+ */
 const initialState: GoalsState = {
     goals: [],
     selectedGoal: null,
@@ -10,13 +13,13 @@ const initialState: GoalsState = {
     error: null,
 };
 
-export const fetchGoals = createAsyncThunk('goals/fetchGoals', async () => {
+export const fetchGoals = createAsyncThunk('custom/fetchGoals', async () => {
     const response = await api.get('/goals');
     return response.data.data;
 });
 
 export const createGoal = createAsyncThunk(
-    'goals/createGoal',
+    'custom/createGoal',
     async (goalData: Partial<Goal>) => {
         const response = await api.post('/goals', goalData);
         return response.data.data;
@@ -24,7 +27,7 @@ export const createGoal = createAsyncThunk(
 );
 
 export const updateGoal = createAsyncThunk(
-    'goals/updateGoal',
+    'custom/updateGoal',
     async ({id, data}: { id: number; data: Partial<Goal> }) => {
         const response = await api.patch(`/goals/${id}`, data);
         return response.data.data;
@@ -32,7 +35,7 @@ export const updateGoal = createAsyncThunk(
 );
 
 export const deleteGoal = createAsyncThunk(
-    'goals/deleteGoal',
+    'custom/deleteGoal',
     async (id: number) => {
         await api.delete(`/goals/${id}`);
         return id;
@@ -40,7 +43,7 @@ export const deleteGoal = createAsyncThunk(
 );
 
 export const fetchGoalProgress = createAsyncThunk(
-    'goals/fetchProgress',
+    'custom/fetchProgress',
     async (goalId: number) => {
         const response = await api.get(`/goals/${goalId}/progress`);
         return response.data.data;
@@ -48,7 +51,7 @@ export const fetchGoalProgress = createAsyncThunk(
 );
 
 export const logProgress = createAsyncThunk(
-    'goals/logProgress',
+    'custom/logProgress',
     async ({
                goalId,
                data,
@@ -83,7 +86,7 @@ const goalsSlice = createSlice({
             })
             .addCase(fetchGoals.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message || 'Failed to fetch goals';
+                state.error = action.error.message || 'Failed to fetch custom';
             })
             .addCase(createGoal.fulfilled, (state, action) => {
                 state.goals.push(action.payload);
@@ -106,5 +109,5 @@ const goalsSlice = createSlice({
     },
 });
 
-export const {setSelectedGoal, clearError} = goalsSlice.actions;
+export const {setSelectedGoal} = goalsSlice.actions;
 export default goalsSlice.reducer;

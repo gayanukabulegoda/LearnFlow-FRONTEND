@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This file contains all the types used in the application.
+ * @exports User, Goal, Progress, Resource, AuthState, GoalsState, ResourcesState
+ */
 export interface User {
     id: string;
     email: string;
@@ -10,6 +14,7 @@ export interface Goal {
     description: string;
     status: 'ACTIVE' | 'ARCHIVED' | 'COMPLETED';
     targetDate: string;
+    progress?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -25,10 +30,11 @@ export interface Progress {
 export interface Resource {
     id: number;
     title: string;
-    description: string;
+    reason: string;
     url: string;
     type: string;
     createdAt: string;
+    tags: string;
 }
 
 export interface AuthState {
@@ -50,4 +56,6 @@ export interface ResourcesState {
     recommendations: Resource[];
     isLoading: boolean;
     error: string | null;
+    reason: string | null;
+    tags: string;
 }

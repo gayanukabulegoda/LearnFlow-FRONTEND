@@ -1,11 +1,16 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import type { ResourcesState } from '../../types';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import type {ResourcesState} from '../../types/types.ts';
 import api from '../../lib/axios';
-
+/**
+ * @fileoverview This file contains the resources slice for the application.
+ * @exports fetchRecommendations, trackInteraction
+ */
 const initialState: ResourcesState = {
     recommendations: [],
     isLoading: false,
     error: null,
+    reason: null,
+    tags: '',
 };
 
 export const fetchRecommendations = createAsyncThunk(
@@ -25,7 +30,7 @@ export const trackInteraction = createAsyncThunk(
         recommendationId: number;
         type: string;
     }) => {
-        const response = await api.post('/resources/interactions', {
+        const response = await api.post('/resources/interact', {
             recommendationId,
             type,
         });
@@ -57,5 +62,4 @@ const resourcesSlice = createSlice({
     },
 });
 
-export const { clearError } = resourcesSlice.actions;
 export default resourcesSlice.reducer;

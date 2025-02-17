@@ -1,7 +1,10 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import type {AuthState} from '../../types';
+import type {AuthState} from '../../types/types.ts';
 import api from '../../lib/axios';
-
+/**
+ * @fileoverview This file contains the auth slice for the application.
+ * @exports login, register, getCurrentUser, logout, clearError
+ */
 const initialState: AuthState = {
     user: null,
     isAuthenticated: false,
@@ -11,17 +14,31 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
     'auth/login',
-    async (credentials: { email: string; password: string }) => {
-        const response = await api.post('/auth/login', credentials);
-        return response.data.data;
+    async (credentials: { email: string; password: string }, {rejectWithValue}) => {
+        try {
+            const response = await api.post('/auth/login', credentials);
+            return response.data.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                return rejectWithValue(error.response.data.message);
+            }
+            return rejectWithValue('Invalid email or password');
+        }
     }
 );
 
 export const register = createAsyncThunk(
     'auth/register',
-    async (userData: { email: string; password: string; name: string }) => {
-        const response = await api.post('/auth/register', userData);
-        return response.data.data;
+    async (userData: { email: string; password: string; name: string }, {rejectWithValue}) => {
+        try {
+            const response = await api.post('/auth/register', userData);
+            return response.data.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                return rejectWithValue(error.response.data.message);
+            }
+            return rejectWithValue('Registration failed');
+        }
     }
 );
 
@@ -34,9 +51,10 @@ export const logout = createAsyncThunk('auth/logout', async () => {
     try {
         await api.post('/auth/logout');
     } finally {
-        // Always clear cookies even if the logout request fails
+        // Clear cookies even if the logout request fails
         document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        window.location.href = '/login';
     }
 });
 
@@ -61,7 +79,7 @@ const authSlice = createSlice({
             })
             .addCase(login.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message || 'Login failed';
+                state.error = action.payload as string || 'Login failed';
             })
             .addCase(register.pending, (state) => {
                 state.isLoading = true;
@@ -74,7 +92,7 @@ const authSlice = createSlice({
             })
             .addCase(register.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message || 'Registration failed';
+                state.error = action.payload as string || 'Registration failed';
             })
             .addCase(getCurrentUser.pending, (state) => {
                 state.isLoading = true;

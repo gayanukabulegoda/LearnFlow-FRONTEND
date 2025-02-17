@@ -2,7 +2,11 @@ import {configureStore} from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import goalsReducer from './slices/goalsSlice';
 import resourcesReducer from './slices/resourcesSlice';
-
+/**
+ * @fileoverview This file contains the store configuration for the application.
+ * @reducers authReducer, goalsReducer, resourcesReducer
+ * @exports RootState, AppDispatch, store
+ */
 export const store = configureStore({
     reducer: {
         auth: authReducer,
